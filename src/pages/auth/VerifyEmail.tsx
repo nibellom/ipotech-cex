@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Card, CardContent, Typography, Button } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
+import { api } from '../../lib/http';
 
 export default function VerifyEmail(){
   const { t } = useTranslation();
@@ -13,7 +13,7 @@ export default function VerifyEmail(){
   useEffect(()=>{
     async function run(){
       try{
-        const r = await axios.get('/api/auth/verify', { params: { token } });
+            const r = await api.get('/api/auth/verify', { params: { token } });
         setStatus(r.data.message || t('verified'));
       }catch(e:any){
         setStatus(e?.response?.data?.message || t('invalid_or_expired_link'));

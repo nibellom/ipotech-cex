@@ -4,7 +4,7 @@ import {
   Tabs, Tab, Button, Table, TableHead, TableRow, TableCell, TableBody, Divider, Box
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
+import { api } from '../lib/http';
 import CandlesChart, { Candle as CandleT } from '../components/CandlesChart';
 import { getSocket } from '../realtime/socket';
 
@@ -85,7 +85,7 @@ export default function Trade() {
     if (!market) return;
     setLoadingCandles(true);
     try {
-      const r = await axios.get('/api/trade/candles', {
+      const r = await api.get('/api/trade/candles', {
         ...auth(),
         params: { market, interval: tf, limit: 300, _t: Date.now() } // bust cache
       });
@@ -107,7 +107,7 @@ export default function Trade() {
     if (!market) return;
     const id = setInterval(async () => {
       try {
-        const r = await axios.get('/api/trade/candles', {
+        const r = await api.get('/api/trade/candles', {
           ...auth(),
           params: { market, interval: tf, limit: 120, _t: Date.now() } // bust cache
         });
@@ -129,7 +129,7 @@ export default function Trade() {
   // ---- Дозагрузка истории при скролле влево на графике
   const loadMoreLeft = useCallback(async (oldestTs: number) => {
     try {
-      const r = await axios.get('/api/trade/candles', {
+      const r = await api.get('/api/trade/candles', {
         ...auth(),
         params: { market, interval: tf, to: oldestTs, limit: 300, _t: Date.now() } // bust cache
       });
@@ -148,7 +148,7 @@ export default function Trade() {
 
   // ---- Рынки (один раз)
   useEffect(() => {
-    axios.get('/api/trade/markets', auth())
+    api.get('/api/trade/markets', auth())
       .then(r => {
         const arr = r.data.markets || [];
         setMarkets(arr);
@@ -163,9 +163,9 @@ export default function Trade() {
     let cancelled = false;
     (async () => {
       try {
-        const [ob, tr] = await Promise.all([
-          axios.get('/api/trade/orderbook', { ...auth(), params: { market, depth: 20 } }),
-          axios.get('/api/trade/trades',    { ...auth(), params: { market, limit: 50 } }),
+          const [ob, tr] = await Promise.all([
+            api.get('/api/trade/orderbook', { ...auth(), params: { market, depth: 20 } }),
+            api.get('/api/trade/trades',    { ...auth(), params: { market, limit: 50 } }),
         ]);
         if (!cancelled) {
           setOrderbook(ob.data);
@@ -183,8 +183,8 @@ export default function Trade() {
     (async () => {
       try {
         const [o, t] = await Promise.all([
-          axios.get('/api/trade/my/orders', { ...auth(), params: { status: 'open', market } }),
-          axios.get('/api/trade/my/trades', { ...auth(), params: { market, limit: 100 } }),
+          api.get('/api/trade/my/orders', { ...auth(), params: { status: 'open', market } }),
+          api.get('/api/trade/my/trades', { ...auth(), params: { market, limit: 100 } }),
         ]);
         if (!stop) {
           setMyOrders(o.data.orders || []);
@@ -239,7 +239,7 @@ export default function Trade() {
   const submit = async () => {
     if (!canSubmit) return;
     try {
-      await axios.post('/api/trade/order', {
+      await api.post('/api/trade/order', {
         market, side: tab, price: Number(price), amount: Number(amount)
       }, auth());
       setAmount('');
@@ -250,7 +250,7 @@ export default function Trade() {
 
   const cancel = async (id: string) => {
     try {
-      await axios.post(`/api/trade/cancel/${id}`, {}, auth());
+      await api.post(`/api/trade/cancel/${id}`, {}, auth());
     } catch (e:any) {
       alert(e?.response?.data?.message || t('error'));
     }

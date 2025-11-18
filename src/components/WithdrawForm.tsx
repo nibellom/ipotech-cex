@@ -4,7 +4,7 @@ import {
   Table, TableHead, TableRow, TableCell, TableBody
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
+import { api } from '../lib/http';
 
 type AssetRow = { asset: string; spot: number; trade: number; dividend: number; total: number };
 type Withdrawal = { _id: string; asset: string; chain: string; amount: number; toAddress: string; status: string; txHash?: string; createdAt: string };
@@ -22,7 +22,7 @@ export default function WithdrawForm() {
 
   const load = async () => {
     // активы из балансов
-    const bal = await axios.get<{ assets: AssetRow[] }>('/api/wallets/balances', auth);
+    const bal = await api.get<{ assets: AssetRow[] }>('/api/wallets/balances', auth);
     const list = (bal.data.assets || []).map(a => a.asset).filter(Boolean);
     const uniq = list.filter((v, i, arr) => arr.indexOf(v) === i);
     if (uniq.length) {
@@ -31,7 +31,7 @@ export default function WithdrawForm() {
     }
 
     // история выводов
-    const w = await axios.get<{ withdrawals: Withdrawal[] }>('/api/withdrawals/me', auth);
+    const w = await api.get<{ withdrawals: Withdrawal[] }>('/api/withdrawals/me', auth);
     setHistory(w.data.withdrawals || []);
   };
 
@@ -43,7 +43,7 @@ export default function WithdrawForm() {
     if (!canSubmit) return;
     try {
       setSubmitting(true);
-      await axios.post('/api/withdrawals/request', {
+      await api.post('/api/withdrawals/request', {
         asset, chain, amount: Number(amount), toAddress
       }, auth);
       setAmount('');

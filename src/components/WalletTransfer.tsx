@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, TextField, MenuItem, Button, Stack, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
+import { api } from '../lib/http';
 
 const walletTypes: string[] = ['spot', 'trade', 'dividend'];
 
@@ -24,7 +24,7 @@ export default function WalletTransfer() {
     const token = localStorage.getItem('token');
     if (!token) return;
 
-    axios
+    api
       .get<ApiBalancesResponse>('/api/wallets/balances', {
         headers: { Authorization: `Bearer ${token}` },
       })
@@ -59,7 +59,7 @@ export default function WalletTransfer() {
     if (!canSubmit) return;
     try {
       setSubmitting(true);
-      await axios.post(
+      await api.post(
         '/api/wallets/transfer',
         {
           asset,

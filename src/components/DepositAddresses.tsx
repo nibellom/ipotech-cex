@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardContent, Typography, Button, Stack, List, ListItem, ListItemText, IconButton, Tooltip } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import axios from 'axios';
+import { api } from '../lib/http';
 
 type DepAddr = { _id: string; chain: string; address: string; createdAt: string };
 
@@ -13,7 +13,7 @@ export default function DepositAddresses() {
   const auth = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
 
   const load = async () => {
-    const r = await axios.get('/api/deposits/me', auth);
+    const r = await api.get('/api/deposits/me', auth);
     setList(r.data.addresses || []);
   };
 
@@ -22,7 +22,7 @@ export default function DepositAddresses() {
   const issue = async (chain: 'bsc' | 'eth') => {
     setLoading(true);
     try {
-      await axios.get(`/api/deposits/address?chain=${chain}`, auth);
+      await api.get(`/api/deposits/address?chain=${chain}`, auth);
       await load();
     } finally {
       setLoading(false);

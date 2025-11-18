@@ -5,7 +5,7 @@ import {
   TableCell, TableBody, LinearProgress, Stack, Chip, Tooltip
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
+import { api } from '../lib/http';
 import { getSocket } from '../realtime/socket';
 
 type FundingDest = { chain: string; address: string };
@@ -53,8 +53,8 @@ export default function DividendCenter() {
     const load = async () => {
       try {
         const [pub, me] = await Promise.all([
-          axios.get('/api/dividends/plans', { params: { _t: Date.now() } }),
-          axios.get('/api/dividends/me/payouts', { ...auth(), params: { _t: Date.now() } }).catch(() => ({ data: { payouts: [] } }))
+          api.get('/api/dividends/plans', { params: { _t: Date.now() } }),
+          api.get('/api/dividends/me/payouts', { ...auth(), params: { _t: Date.now() } }).catch(() => ({ data: { payouts: [] } }))
         ]);
         setPlans(pub.data.plans || []);
         setPayouts(me.data.payouts || []);

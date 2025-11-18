@@ -5,7 +5,7 @@ import {
   Link, Chip, Tooltip
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
+import { api } from '../../lib/http';
 
 type TokenT = { _id: string; symbol: string; name?: string; chain?: string; contractAddress?: string };
 type ListingT = any;
@@ -45,10 +45,10 @@ export default function DividendAdmin() {
   const [listMsg, setListMsg] = useState('');
 
   const reload = async () => {
-    try { const t = await axios.get('/api/tokens/listed'); setTokens(t.data.tokens || []); } catch {}
-    try { const p = await axios.get('/api/company/dividends', auth); setPlans(p.data.plans || []); } catch {}
-    try { const l = await axios.get('/api/company/listings', auth); setMyListings(l.data.listings || []); } catch {}
-    try { const b = await axios.get('/api/me/balances', auth); setBalances(b.data.balances || []); } catch {}
+    try { const t = await api.get('/api/tokens/listed'); setTokens(t.data.tokens || []); } catch {}
+    try { const p = await api.get('/api/company/dividends', auth); setPlans(p.data.plans || []); } catch {}
+    try { const l = await api.get('/api/company/listings', auth); setMyListings(l.data.listings || []); } catch {}
+    try { const b = await api.get('/api/me/balances', auth); setBalances(b.data.balances || []); } catch {}
   };
 
   useEffect(()=>{ reload(); },[]);
@@ -103,7 +103,7 @@ export default function DividendAdmin() {
     if (!validatePlan()) return;
     setSubmitting(true);
     try {
-      await axios.post('/api/company/dividends', {
+      await api.post('/api/company/dividends', {
         tokenId: form.tokenId,
         amountUSDT: Number(form.amountUSDT),
         recordTime: form.recordTime,
@@ -123,7 +123,7 @@ export default function DividendAdmin() {
   // единственная кнопка действия — Pay now
   const payNow = async (planId: string) => {
     try {
-      const r = await axios.post(`/api/company/dividends/${planId}/pay`, { force: false }, auth);
+      const r = await api.post(`/api/company/dividends/${planId}/pay`, { force: false }, auth);
       const { recipients, totalDistributed, note } = r.data || {};
       await reload();
       alert(`${t('pay_now')} done.\n${t('recipients')}: ${recipients || 0}\n${t('total_distributed')}: ${totalDistributed || 0}${note ? `\n${t('note')}: ${note}` : ''}`);
@@ -202,7 +202,7 @@ export default function DividendAdmin() {
                     setListSubmitting(true);
                     try {
                       const body = { ...listing, decimals: Number(listing.decimals) };
-                      await axios.post('/api/company/listings', body, auth);
+                      await api.post('/api/company/listings', body, auth);
                       setListing({
                         symbol: '', name: '', decimals: 18, chain: 'bsc', contractAddress: '',
                         description: '', website: ''

@@ -4,7 +4,7 @@ import {
   Grid, Chip, Tabs, Tab, Box, Stack, Divider
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
+import { api } from '../lib/http';
 import WalletTransfer from '../components/WalletTransfer';
 import DepositAddresses from '../components/DepositAddresses';
 import WithdrawForm from '../components/WithdrawForm';
@@ -60,7 +60,7 @@ export default function Wallets() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) return;
-    axios.get('/api/wallets/balances', { headers: { Authorization: `Bearer ${token}` } })
+    api.get('/api/wallets/balances', { headers: { Authorization: `Bearer ${token}` } })
       .then(r => {
         setRows(r.data.assets || []);
         setEntries(r.data.entries || []);
@@ -97,7 +97,7 @@ export default function Wallets() {
       await Promise.all(assets.map(async (a) => {
         try {
           const market = `${a}-USDT`;
-          const r = await axios.get('/api/trade/trades', { ...auth(), params: { market, limit: 1 } });
+          const r = await api.get('/api/trade/trades', { ...auth(), params: { market, limit: 1 } });
           const price = r.data?.trades?.[0]?.price;
           if (price) map[a] = Number(price);
           // если сделок нет — актив не учитываем в суммах

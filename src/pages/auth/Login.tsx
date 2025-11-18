@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Card, CardContent, TextField, Button, Stack, Typography, Link } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
+import { api } from '../../lib/http';
 import { saveAuth } from '../../lib/auth';
 
 export default function Login(){
@@ -13,7 +13,7 @@ export default function Login(){
   const submit = async ()=>{
     setError('');
     try{
-      const r = await axios.post('/api/auth/login', { email, password });
+      const r = await api.post('/api/auth/login', { email, password });
       saveAuth(r.data.token, r.data.role, r.data.email);
       window.location.href = '/';
     }catch(e:any){

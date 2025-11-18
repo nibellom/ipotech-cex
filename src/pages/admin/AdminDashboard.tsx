@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Container, Card, CardContent, Typography, Table, TableHead, TableRow, TableCell, TableBody, Button, Link, Grid } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
+import { api } from '../../lib/http';
 
 export default function AdminDashboard() {
   const { t } = useTranslation();
@@ -13,26 +13,26 @@ export default function AdminDashboard() {
   const [feesStats, setFeesStats] = useState<any>(null);
 
   const reload = async () => {
-    const l = await axios.get('/api/admin/listings?status=pending', auth);
+    const l = await api.get('/api/admin/listings?status=pending', auth);
     setListings(l.data.listings || []);
-    const p = await axios.get('/api/admin/plans', auth);
+    const p = await api.get('/api/admin/plans', auth);
     setPlans(p.data.plans || []);
-    const a = await axios.get('/api/admin/audits', auth);
+    const a = await api.get('/api/admin/audits', auth);
     setAudits(a.data.audits || []);
 
     // Запрос баланса hot wallet (нужно реализовать на сервере)
-    const hw = await axios.get('/api/admin/hotwallet/balances', auth);
+    const hw = await api.get('/api/admin/hotwallet/balances', auth);
     setHotWalletBalances(hw.data.balances || []); // Ожидаем { balances: [{ chain, asset, balance }, ...] }
 
     // Запрос статистики комиссий
-    const fees = await axios.get('/api/admin/fees/stats', auth);
+    const fees = await api.get('/api/admin/fees/stats', auth);
     setFeesStats(fees.data || null);
   };
 
   useEffect(() => { reload().catch(() => {}); }, []);
 
-  const approve = async (id: string) => { await axios.post('/api/admin/listings/' + id + '/approve', {}, auth); reload(); };
-  const suspend = async (id: string) => { await axios.post('/api/admin/listings/' + id + '/suspend', {}, auth); reload(); };
+  const approve = async (id: string) => { await api.post('/api/admin/listings/' + id + '/approve', {}, auth); reload(); };
+  const suspend = async (id: string) => { await api.post('/api/admin/listings/' + id + '/suspend', {}, auth); reload(); };
 
   const fmt = (n: number) => Number(n).toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 });
 

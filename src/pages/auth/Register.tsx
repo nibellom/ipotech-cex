@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Card, CardContent, TextField, Button, Stack, Typography, MenuItem } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
+import { api } from '../../lib/http';
 
 export default function Register(){
   const { t } = useTranslation();
@@ -19,7 +19,7 @@ export default function Register(){
       return;
     }
     try{
-      const r = await axios.post('/api/auth/register', { email: cleanEmail, password, role });
+      const r = await api.post('/api/auth/register', { email: cleanEmail, password, role });
       setMessage(r.data.message || t('registered_check_email'));
     }catch(e:any){
       setMessage(e?.response?.data?.message || t('error'));
