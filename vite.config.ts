@@ -6,10 +6,10 @@ export default defineConfig({
   server: {
     proxy: {
       // уже было для REST:
-      '/api': { target: 'http://localhost:4000', changeOrigin: true },
+      '/api': { target: 'https://ipotec-cex-nibellom.amvera.io', changeOrigin: true },
       // НОВОЕ: прокси для WebSocket Socket.IO
       '/socket.io': {
-        target: 'http://localhost:4000',
+        target: 'https://ipotec-cex-nibellom.amvera.io',
         ws: true,
         changeOrigin: true,
       },
